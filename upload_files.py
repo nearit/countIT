@@ -7,7 +7,7 @@ with open('config.json', 'r') as f:
     config = json.load(f)
     folder_name = config["customer"]+"/"+config["env"]+"/"+config["id"]
     bucket_name = config["bucket_name"]
-    path = os.getcwd()+folder_name
+    path = os.getcwd()+"/"+folder_name
 
     # enumerate local files recursively
     for root, dirs, files in os.walk(path):
