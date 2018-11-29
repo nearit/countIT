@@ -50,7 +50,7 @@ def main():
 
 def schedule_upload_jobs(upload_frequency):
     cron = CronTab(user="pi")
-    path = os.getcwd()+"upload_files.py"
+    path = os.getcwd()+"/upload_files.py"
     command = "python "+path
 
     # Remove existing identical commands
