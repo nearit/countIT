@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import boto3
 from compressor import gzip_file
 

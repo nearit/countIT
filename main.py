@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import getopt
 import json
 import netifaces
