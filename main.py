@@ -67,16 +67,16 @@ def schedule_upload_jobs(upload_frequency):
     # Set cron based on config file
     if upload_frequency == "hourly":
         # every hour
-        new_job.every(1).hour
+        new_job.every(1).hours()
     elif upload_frequency == "daily":
         # everyday at midnight
-        new_job.every(1).day
+        new_job.every(1).day()
     elif upload_frequency == "weekly":
         # every Sunday at midnight
         new_job.dow.on('SUN')
     elif upload_frequency == "monthly":
         # every 1st of month at midnight
-        new_job.every(1).month
+        new_job.every(1).month()
     cron.write()
 
 
