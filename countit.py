@@ -23,8 +23,12 @@ def main():
     adapter = "wlan1"
     upload_frequency = "daily"
 
+    script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+    config_file = "config.json"
+    config = os.path.join(script_dir, config_file)
+
     # Parse config
-    with open('config.json', 'r') as f:
+    with open(config, 'r') as f:
         config = json.load(f)
         if "scan_time" in config:
             scan_time = config["scan_time"]
@@ -34,7 +38,8 @@ def main():
             print "You MUST define \"customer\", \"env\" and \"id\" value in config.json"
             sys.exit(1)
         else:
-            folder_name = config["customer"]+"/"+config["env"]+"/"+config["id"]
+            out_directory = config["customer"]+"/"+config["env"]+"/"+config["id"]
+            folder_name = os.path.join(script_dir, out_directory)
         if "upload_frequency" in config:
             upload_frequency = config["upload_frequency"]
         print("Config:")
@@ -44,16 +49,18 @@ def main():
         print("\tupload frequency: {}".format(upload_frequency))
 
         # Define jobs
-        schedule_upload_jobs(upload_frequency)
+        schedule_upload_jobs(script_dir, upload_frequency)
 
         # Infinite scan
         while True:
             adapter = scan(adapter, scan_time, max_rssi, folder_name)
 
-def schedule_upload_jobs(upload_frequency):
+def schedule_upload_jobs(directory, upload_frequency):
     cron = CronTab(user="pi")
-    path = os.getcwd()+"/upload_files.py"
-    command = "sleep 60 && python "+path
+
+    uploader_path = "upload_files.py"
+    path = os.path.join(directory, uploader_path)
+    command = "python "+path
 
     # Remove existing identical commands
     jobs = cron.find_command(command)
