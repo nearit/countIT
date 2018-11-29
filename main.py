@@ -168,7 +168,7 @@ def scan(adapter, scantime, maxpower, outfolder):
     # Create log file with count and found devices
     if outfolder:
         if not(os.path.exists(outfolder)):
-            os.mkdirs(outfolder)
+            os.makedirs(outfolder)
         with open(outfolder+'/'+time.strftime('%Y-%m-%d_%H:%M:%S'), 'w') as f:
             data_dump = {'count': num_people, 'devices': cellphone_people}
             f.write(json.dumps(data_dump) + "\n")
