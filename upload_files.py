@@ -13,6 +13,6 @@ with open('config.json', 'r') as f:
     for root, dirs, files in os.walk(path):
         for filename in files:
             # construct the full local path
-            file_path = os.path.join(root, filename)
+            file_path = os.path.join(folder_name, filename)
             # upload the file
             upload_file(file_path, bucket_name)
