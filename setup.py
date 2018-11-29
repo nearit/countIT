@@ -1,6 +1,6 @@
 import os
 
-from crontab import crontab
+from crontab import CronTab
 
 cron = CronTab(user="pi")
 command = "python "+os.getcwd()+"/main.py"
