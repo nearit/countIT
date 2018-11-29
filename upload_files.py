@@ -21,4 +21,4 @@ with open(config, 'r') as f:
             # construct the full local path
             file_path = os.path.join(path, filename)
             # upload the file
-            upload_file(file_path, bucket_name)
+            upload_file(file_path, bucket_name, folder_name+"/"+filename)
