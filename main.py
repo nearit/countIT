@@ -59,12 +59,11 @@ def schedule_upload_jobs(upload_frequency):
         cron.remove(job)
 
     new_job = cron.new(command=command)
+    reboot_job = cron.new(command=command)
 
     # Set cron default (on every reboot and everyday/midnight)
-    new_job.every_reboot()
-    cron.write()
+    reboot_job.every_reboot()
     new_job.every(1).day()
-    cron.write()
 
     # Set cron based on config file
     if upload_frequency == "hourly":
