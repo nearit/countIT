@@ -32,7 +32,7 @@ def main():
             print "You MUST define \"customer\", \"env\" and \"id\" value in config.json"
             sys.exit(1)
         else:
-            folder_name = config["customer"]+config["env"]+config["id"]
+            folder_name = config["customer"]+"/"+config["env"]+"/"+config["id"]
         if "upload_frequency" in config:
             upload_frequency = config["upload_frequency"]
         print("Config:")

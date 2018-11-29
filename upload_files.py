@@ -5,7 +5,7 @@ from uploader import upload_file
 
 with open('config.json', 'r') as f:
     config = json.load(f)
-    folder_name = config["customer"]+config["env"]+config["id"]
+    folder_name = config["customer"]+"/"+config["env"]+"/"+config["id"]
     bucket_name = config["bucket_name"]
     path = os.getcwd()+folder_name
 
