@@ -59,8 +59,7 @@ def schedule_upload_jobs(directory, upload_frequency):
     cron = CronTab(user="pi")
 
     uploader_path = "upload_files.py"
-    path = os.path.join(directory, uploader_path)
-    command = "python "+path
+    command = os.path.join(directory, uploader_path)
 
     # Remove existing identical commands
     jobs = cron.find_command(command)
