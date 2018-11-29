@@ -89,11 +89,6 @@ def scan(adapter, scantime, maxpower, outfolder):
     
     # If, for some reason, the adapter name is empty, show a picker
     if len(adapter) == 0:
-        if os.name == 'nt':
-            print('You must specify the adapter')
-            print('Choose from the following: ' +
-                  ', '.join(netifaces.interfaces()))
-            return
         title = 'Please choose the adapter you want to use: '
         adapter, index = pick(netifaces.interfaces(), title)
 
