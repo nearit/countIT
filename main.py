@@ -65,7 +65,10 @@ def schedule_upload_jobs(upload_frequency):
     new_job.every(1).day
 
     # Set cron based on config file
-    if upload_frequency == "daily":
+    if upload_frequency == "hourly":
+        # every hour
+        new_job.every(1).hour
+    elif upload_frequency == "daily":
         # everyday at midnight
         new_job.every(1).day
     elif upload_frequency == "weekly":
