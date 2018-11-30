@@ -5,7 +5,7 @@ import os
 from crontab import CronTab
 
 cron = CronTab(user="pi")
-command = "/home/pi/countIT/countit.py"
+command = os.getcwd()+"/countIT.py"
 job = cron.new(command=command, comment="run countIT at boot")
 job.every_reboot()
 cron.write()
