@@ -63,7 +63,7 @@ aws_secret_access_key = YOUR_SECRET_ACCESS_KEY
 To test this tool just run
 
 ```sh
-python main.py
+python countit.py
 ```
 
 ## Deploy the tool
