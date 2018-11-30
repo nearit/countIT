@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from io import BytesIO
 from tempfile import TemporaryFile
 import gzip

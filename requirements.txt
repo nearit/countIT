@@ -1,0 +1,4 @@
+boto3==1.9.55
+netifaces==0.10.7
+pick==0.6.4
+python-crontab==2.3.5
