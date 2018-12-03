@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -14,6 +17,19 @@ import (
 	"log"
 )
 
+// Trackings contains total count and a list of detections
+type Trackings struct {
+	Count   int         `json:"count"`
+	Devices []Detection `json:"devices"`
+}
+
+// Detection contains RSSI, MAC address and Manufaturer detected
+type Detection struct {
+	RSSI         float32 `json:"rssi"`
+	MAC          string  `json:"mac"`
+	Manufacturer string  `json:"Manufacturer"`
+}
+
 const dateFormat = "2006-01-02_15:04:05"
 
 func main() {
@@ -21,9 +37,8 @@ func main() {
 	folder := config.Customer + "/" + config.Env + "/" + config.ID
 
 	start, _ := time.Parse(dateFormat, config.StartDate)
-	fmt.Println(start)
 	end, _ := time.Parse(dateFormat, config.EndDate)
-	fmt.Println(end)
+	fmt.Println("Fetching detections from", start, "to", end)
 	listObjects(config.Region, config.Bucket, folder, start, end)
 }
 
@@ -44,17 +59,40 @@ func listObjects(region string, bucket string, folder string, start time.Time, e
 	}
 
 	for _, item := range resp.Contents {
-		time, _ := time.Parse(dateFormat, strings.TrimPrefix(*item.Key, folder+"/"))
+		filename := strings.TrimPrefix(*item.Key, folder+"/")
+		time, _ := time.Parse(dateFormat, filename)
 		if inTimeSpan(start, end, time) {
-			fmt.Println("Name:         ", *item.Key)
-			fmt.Println("Last modified:", *item.LastModified)
-			fmt.Println("Size:         ", *item.Size)
-			fmt.Println("")
+			trackings := readFile(*item.Key, region, bucket)
+			fmt.Println(filename, "-->", trackings.Count)
+			//downloadObject(*item.Key, region, bucket)
 		}
 	}
+}
 
-	fmt.Println("Found", len(resp.Contents), "items in bucket", bucket)
-	fmt.Println("")
+func readFile(filename string, region string, bucket string) Trackings {
+	sess := session.New()
+	svc := s3.New(sess, aws.NewConfig().WithRegion(region))
+
+	results, err := svc.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(filename),
+	})
+
+	if err != nil {
+
+	}
+
+	defer results.Body.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, results.Body); err != nil {
+
+	}
+	var trackings Trackings
+	jsonParser := json.NewDecoder(buf)
+	jsonParser.Decode(&trackings)
+
+	return trackings
 }
 
 func downloadObject(filename string, region string, bucket string) {
