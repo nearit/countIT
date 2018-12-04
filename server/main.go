@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+
 	"io"
 	"os"
 	"strings"
@@ -11,10 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
 	"fmt"
-	"log"
 )
 
 // Trackings contains total count and a list of detections
@@ -30,64 +29,69 @@ type Detection struct {
 	Manufacturer string  `json:"Manufacturer"`
 }
 
-const dateFormat = "2006-01-02_15:04:05"
+var config Config
+var folder string
 
 func main() {
-	config := loadConfig("config.json")
-	folder := config.Customer + "/" + config.Env + "/" + config.ID
+	config = loadConfig("config.json")
+	folder = config.Customer + "/" + config.Env + "/" + config.ID
 
-	start, _ := time.Parse(dateFormat, config.StartDate)
-	end, _ := time.Parse(dateFormat, config.EndDate)
-	fmt.Println("Fetching detections from", start, "to", end)
-	listObjects(config.Region, config.Bucket, folder, start, end)
+	listObjects()
 }
 
-func listObjects(region string, bucket string, folder string, start time.Time, end time.Time) {
+func listObjects() {
+	fmt.Println("Fetching detections from", config.StartDate, "to", config.EndDate)
+
+	start := parseDate(config.StartDate)
+	end := parseDate(config.EndDate)
+
 	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String(region)},
+		Region: aws.String(config.Region)},
 	)
 
 	svc := s3.New(sess)
 
-	// Get the list of items
 	resp, err := svc.ListObjects(&s3.ListObjectsInput{
-		Bucket: aws.String(bucket),
+		Bucket: aws.String(config.Bucket),
 		Prefix: aws.String(folder),
 	})
 	if err != nil {
-		exitErrorf("Unable to list items in bucket %q, %v", bucket, err)
+		exitErrorf("Unable to list items in bucket %q, %v", config.Bucket, err)
 	}
 
+	initReport()
 	for _, item := range resp.Contents {
 		filename := strings.TrimPrefix(*item.Key, folder+"/")
-		time, _ := time.Parse(dateFormat, filename)
+		time := parseDate(filename)
 		if inTimeSpan(start, end, time) {
-			trackings := readFile(*item.Key, region, bucket)
-			fmt.Println(filename, "-->", trackings.Count)
-			//downloadObject(*item.Key, region, bucket)
+			trackings := readFile(*item.Key)
+			addRow(filename, trackings.Count)
 		}
 	}
+	generateReport()
 }
 
-func readFile(filename string, region string, bucket string) Trackings {
+func readFile(filename string) Trackings {
 	sess := session.New()
-	svc := s3.New(sess, aws.NewConfig().WithRegion(region))
+	svc := s3.New(sess, aws.NewConfig().WithRegion(config.Region))
 
 	results, err := svc.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
+		Bucket: aws.String(config.Bucket),
 		Key:    aws.String(filename),
 	})
-
 	if err != nil {
-
+		//log.Fatalf("Unable to get object %q from bucket %v", filename, err)
+		fmt.Printf("Unable to get object %q from bucket %v", filename, err)
 	}
 
 	defer results.Body.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, results.Body); err != nil {
-
+		//log.Fatalf("Unable to bufferize results, %v", err)
+		fmt.Printf("Unable to bufferize results, %v", err)
 	}
+
 	var trackings Trackings
 	jsonParser := json.NewDecoder(buf)
 	jsonParser.Decode(&trackings)
