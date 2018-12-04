@@ -14,3 +14,7 @@ func parseDate(date string) time.Time {
 	}
 	return parsed
 }
+
+func inTimeSpan(start, end, check time.Time) bool {
+	return check.After(start) && check.Before(end)
+}
