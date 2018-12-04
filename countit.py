@@ -89,6 +89,7 @@ def schedule_upload_jobs(directory, upload_frequency):
 
 
 def scan(adapter, scantime, maxpower, outfolder):
+    from_time = time.strftime('%Y-%m-%d %H:%M:%S %z')
     try:
         tshark = which("tshark")
     except:
@@ -130,6 +131,8 @@ def scan(adapter, scantime, maxpower, outfolder):
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output, nothing = run_tshark.communicate()
 
+    to_time = time.strftime('%Y-%m-%d %H:%M:%S %z')
+
     foundMacs = {}
     for line in output.decode('utf-8').split('\n'):
         if line.strip() == '':
@@ -155,13 +158,13 @@ def scan(adapter, scantime, maxpower, outfolder):
     for key, value in foundMacs.items():
         foundMacs[key] = float(sum(value)) / float(len(value))
 
-    cellphone_people = []
+    detections = []
     for mac in foundMacs:
         if foundMacs[mac] > maxpower:
-            cellphone_people.append({'rssi': foundMacs[mac], 'mac': mac})
-        cellphone_people.sort(key=lambda x: x['rssi'], reverse=True)
+            detections.append({'rssi': foundMacs[mac], 'mac': mac})
+        detections.sort(key=lambda x: x['rssi'], reverse=True)
 
-    num_people = len(cellphone_people)
+    num_people = len(detections)
 
     if num_people == 0:
         print("No one around (not even you!).")
@@ -175,7 +178,7 @@ def scan(adapter, scantime, maxpower, outfolder):
         if not(os.path.exists(outfolder)):
             os.makedirs(outfolder)
         with open(outfolder+'/'+time.strftime('%Y-%m-%d_%H:%M:%S'), 'w') as f:
-            data_dump = {'count': num_people, 'devices': cellphone_people}
+            data_dump = {'from': from_time, 'to': to_time, 'count': num_people, 'devices': detections}
             f.write(json.dumps(data_dump) + "\n")
 
     # Remove tmp tshark output
