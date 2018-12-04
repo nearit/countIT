@@ -13,7 +13,6 @@ import traceback
 import uuid
 
 from crontab import CronTab
-from oui import oui
 from pick import pick
 
 def main():
@@ -158,11 +157,8 @@ def scan(adapter, scantime, maxpower, outfolder):
 
     cellphone_people = []
     for mac in foundMacs:
-        oui_id = 'Not in OUI'
-        if mac[:8] in oui:
-            oui_id = oui[mac[:8]]
         if foundMacs[mac] > maxpower:
-            cellphone_people.append({'Manufacturer': oui_id, 'rssi': foundMacs[mac], 'mac': mac})
+            cellphone_people.append({'rssi': foundMacs[mac], 'mac': mac})
         cellphone_people.sort(key=lambda x: x['rssi'], reverse=True)
 
     num_people = len(cellphone_people)
