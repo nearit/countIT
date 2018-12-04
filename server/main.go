@@ -95,33 +95,6 @@ func readFile(filename string, region string, bucket string) Trackings {
 	return trackings
 }
 
-func downloadObject(filename string, region string, bucket string) {
-	file, err := os.Create(filename)
-	if err != nil {
-		exitErrorf("Unable to open file %q, %v", err)
-	}
-
-	defer file.Close()
-
-	sess, _ := session.NewSession(&aws.Config{
-		Region: aws.String(region)},
-	)
-
-	downloader := s3manager.NewDownloader(sess)
-
-	numBytes, downloadErr := downloader.Download(file,
-		&s3.GetObjectInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(filename),
-		})
-
-	if downloadErr != nil {
-		log.Fatalf("Unable to download item %q, %v", filename, err)
-	}
-
-	fmt.Println("Downloaded", file.Name(), numBytes, "bytes")
-}
-
 func inTimeSpan(start, end, check time.Time) bool {
 	return check.After(start) && check.Before(end)
 }
