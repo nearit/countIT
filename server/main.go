@@ -64,7 +64,7 @@ func queryBucket() {
 	initReport()
 	for _, item := range resp.Contents {
 		filename := strings.TrimPrefix(*item.Key, folder+"/")
-		time := parseDate(filename)
+		time := parseDateWithFormat("2006-01-02_15:04:05", filename)
 		if inTimeSpan(start, end, time) {
 			trackings := readFile(*item.Key)
 			addRow(filename, trackings.Count)
