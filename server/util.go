@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const dateFormat = "2006-01-02 15:04:05 +0100"
+const dateFormat = "2006-01-02 15:04:05 +0700"
 
 func parseDateWithFormat(date, format string) time.Time {
 	parsed, err := time.Parse(format, date)
