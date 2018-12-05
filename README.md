@@ -26,6 +26,12 @@ Once you have a configured RPi with a monitor-mode enabled WiFi adapter, you wil
 pip install -r requirements.txt
 ```
 
+If you are experiencing some installation issue, be sure to have `python-dev` installed:
+
+```sh
+sudo apt-get install python-dev
+```
+
 Then you'll need to define a configuration. Place a `config.json` file at the root folder with this structure (replacing the placeholders):
 
 ```json
