@@ -33,11 +33,12 @@ def main():
             scan_time = config["scan_time"]
         if "max_rssi" in config:
             max_rssi = config["max_rssi"]
-        if not("id" in config and "customer" in config and "env" in config):
-            print "You MUST define \"customer\", \"env\" and \"id\" value in config.json"
+        if not("device_id" in config and "customer" in config and "env" in config):
+            print "You MUST define \"customer\", \"env\" and \"device_id\" value in config.json"
             sys.exit(1)
         else:
-            out_directory = config["customer"]+"/"+config["env"]+"/"+config["id"]
+            device_id = config["device_id"]
+            out_directory = config["customer"]+"/"+config["env"]+"/"+device_id
             folder_name = os.path.join(script_dir, out_directory)
         if "upload_frequency" in config:
             upload_frequency = config["upload_frequency"]
@@ -52,7 +53,7 @@ def main():
 
         # Infinite scan
         while True:
-            adapter = scan(adapter, scan_time, max_rssi, folder_name)
+            adapter = scan(adapter, scan_time, max_rssi, folder_name, device_id)
 
 def schedule_upload_jobs(directory, upload_frequency):
     cron = CronTab(user="pi")
@@ -88,7 +89,7 @@ def schedule_upload_jobs(directory, upload_frequency):
     cron.write()
 
 
-def scan(adapter, scantime, maxpower, outfolder):
+def scan(adapter, scantime, maxpower, outfolder, device_id):
     from_time = time.strftime('%Y-%m-%d %H:%M:%S %z')
     try:
         tshark = which("tshark")
@@ -178,7 +179,7 @@ def scan(adapter, scantime, maxpower, outfolder):
         if not(os.path.exists(outfolder)):
             os.makedirs(outfolder)
         with open(outfolder+'/'+time.strftime('%Y-%m-%d_%H:%M:%S'), 'w') as f:
-            data_dump = {'from': from_time, 'to': to_time, 'count': num_people, 'devices': detections}
+            data_dump = {'device_id': device_id, 'from': from_time, 'to': to_time, 'devices': detections}
             f.write(json.dumps(data_dump) + "\n")
 
     # Remove tmp tshark output
