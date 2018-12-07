@@ -150,6 +150,7 @@ def scan(adapter, scantime, max_power, outfolder, device_id):
 
 def parse_scan_result(device_id, max_power, from_time, outfolder):
     """Parse tshark output"""
+    logging.info("Starting output parsing")
 
     # Read tshark output
     command = [
@@ -184,11 +185,14 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
         # detections.sort(key=lambda x: x['rssi'], reverse=True)
 
     if not detections:
-        print "No one around (not even you!)."
+        logging.warning("No signal detected (not even the sniffer!). Probably there is a problem")
+        print "\nNo one around (not even the sniffer!)."
     elif len(detections) == 1:
-        print "No one around, but you."
+        logging.info("No one around, but the sniffer.")
+        print "\nNo one around, but the sniffer."
     else:
-        print "There are about %d people around." % len(detections)
+        logging.info("Detections: %d", len(detections))
+        print "\nThere are about %d people around." % len(detections)
 
     # Create log file with count and found devices
     if outfolder:
