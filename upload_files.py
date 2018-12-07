@@ -11,7 +11,7 @@ config = os.path.join(script_dir, config_file)
 
 with open(config, 'r') as f:
     config = json.load(f)
-    folder_name = config["customer"]+"/"+config["env"]+"/"+config["id"]
+    folder_name = config["customer"]+"/"+config["env"]+"/"+config["device_id"]
     bucket_name = config["bucket_name"]
     path = os.path.join(script_dir, folder_name)
 
