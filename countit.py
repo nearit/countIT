@@ -56,12 +56,13 @@ def main():
         print "\tupload frequency: {}".format(upload_frequency)
 
         logging.info(
-            """Config:  customer: %s,
-                        environment: %s,
-                        device id: %s,
-                        scan period: %i,
-                        max tx power: %f,
-                        upload frequency: %s
+            """Config:
+                customer: %s,
+                environment: %s,
+                device id: %s,
+                scan period: %i,
+                max tx power: %f,
+                upload frequency: %s
             """, customer, env, device_id, scan_time, max_rssi, upload_frequency
             )
 
@@ -95,16 +96,16 @@ def schedule_upload_jobs(directory, upload_frequency):
     # Set cron based on config file
     if upload_frequency == "hourly":
         # every hour
-        new_job.hour.every(1)
+        new_job.every(1).hours()
     elif upload_frequency == "daily":
         # everyday at midnight
-        new_job.day.every(1)
+        new_job.every(1).day()
     elif upload_frequency == "weekly":
         # every Sunday at midnight
         new_job.dow.on('SUN')
     elif upload_frequency == "monthly":
         # every 1st of month at midnight
-        new_job.month.every(1)
+        new_job.every(1).month()
     cron.write()
 
 
