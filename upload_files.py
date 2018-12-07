@@ -1,9 +1,15 @@
 #!/usr/bin/python
 """This module takes care of uploading every detection file to S3 bucker"""
+import logging
 import json
 import os
 
 from uploader import upload_file
+
+LOG_LEVEL = logging.INFO
+LOG_FILE = "/var/log/countit.log"
+LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
+logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
 
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 config_file = "config.json"
@@ -15,6 +21,7 @@ with open(config, 'r') as f:
     bucket_name = config["bucket_name"]
     path = os.path.join(script_dir, folder_name)
 
+    logging.info("Starting dumps upload")
     # enumerate local files recursively
     for root, dirs, files in os.walk(path):
         for filename in files:
