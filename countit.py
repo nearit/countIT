@@ -12,7 +12,7 @@ import traceback
 from crontab import CronTab
 
 LOG_LEVEL = logging.INFO
-LOG_FILE = "/var/log/countit"
+LOG_FILE = "/var/log/countit.log"
 LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
 logging.basicConfig(filename=LOG_FILE, format=LOG_FORMAT, level=LOG_LEVEL)
 
