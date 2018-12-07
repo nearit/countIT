@@ -141,9 +141,19 @@ def scan(adapter, scantime, max_power, outfolder, device_id):
     _, _ = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
+    analysis_thread = threading.Thread(
+        target=parse_scan_result, args=[device_id, max_power, from_time, outfolder]
+    )
+    analysis_thread.start()
+    #parse_scan_result(tshark, device_id, max_power, from_time, outfolder)
+    return adapter
+
+def parse_scan_result(device_id, max_power, from_time, outfolder):
+    """Parse tshark output"""
+
     # Read tshark output
     command = [
-        tshark, '-r',
+        which("tshark"), '-r',
         '/tmp/tshark-temp', '-T',
         'fields', '-e',
         'wlan.sa', '-e',
@@ -154,14 +164,6 @@ def scan(adapter, scantime, max_power, outfolder, device_id):
     output, _ = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
-    parse_scan_result(output, device_id, max_power, from_time, outfolder)
-
-    # Remove tmp tshark output
-    os.remove('/tmp/tshark-temp')
-    return adapter
-
-def parse_scan_result(output, device_id, max_power, from_time, outfolder):
-    """Parse tshark output"""
     to_time = time.strftime('%Y-%m-%d %H:%M:%S %z')
 
     found_macs = parse_macs(output)
@@ -178,16 +180,15 @@ def parse_scan_result(output, device_id, max_power, from_time, outfolder):
     for mac in found_macs:
         if found_macs[mac] > max_power:
             detections.append({'rssi': found_macs[mac], 'mac': mac})
-        detections.sort(key=lambda x: x['rssi'], reverse=True)
+        # TO ENABLE sorting by rssi value, uncomment the following line
+        # detections.sort(key=lambda x: x['rssi'], reverse=True)
 
-    num_people = len(detections)
-
-    if num_people == 0:
+    if not detections:
         print "No one around (not even you!)."
-    elif num_people == 1:
+    elif len(detections) == 1:
         print "No one around, but you."
     else:
-        print "There are about %d people around." % num_people
+        print "There are about %d people around." % len(detections)
 
     # Create log file with count and found devices
     if outfolder:
@@ -198,6 +199,9 @@ def parse_scan_result(output, device_id, max_power, from_time, outfolder):
                 'device_id': device_id, 'from': from_time, 'to': to_time, 'devices': detections
             }
             dump_file.write(json.dumps(data_dump) + "\n")
+
+    # Remove tmp tshark output
+    os.remove('/tmp/tshark-temp')
 
 def parse_macs(output):
     """Parse tshark output and return a dict"""
