@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""This module takes care of uploading every detection file to S3 bucker"""
+"""This module takes care of uploading every detection file to S3 bucket"""
 import logging
 import json
 import os
