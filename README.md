@@ -2,6 +2,17 @@
 
 A [howmanypeoplearearound](https://github.com/schollz/howmanypeoplearearound) inspired tool.
 
+This tool generates reports containing the detections details (scan time interval, `device_id` and `rssi` and `mac` address of each detection) and uploads them to a S3 bucket.
+
+***Note***: It may be illegal to monitor networks for MAC addresses, especially on networks that *you do not own*. Please check your country's laws (for US [Section 18 U.S. Code § 2511](https://www.law.cornell.edu/uscode/text/18/2511)) - [discussion](https://github.com/schollz/howmanypeoplearearound/issues/4).
+
+## Requirements
+
+* Raspberry Pi
+* Monitor mode enabled WiFi adapter
+
+(Tested with [Alfa AWUS036NHA](https://www.amazon.com/Alfa-AWUS036NHA-Wireless-USB-Adaptor/dp/B004Y6MIXS) adapter)
+
 ## Setup
 
 ### Install tshark
@@ -77,5 +88,11 @@ python countit.py
 Just run the setup, it will automagically schedule runs and uploads.
 
 ```sh
-python setup.py
+sudo python setup.py
 ```
+
+_`sudo` is required to create log file in `/var/log/` and to change its permissions_
+
+## Troubleshooting
+
+If you're experiencing some strange behavior, scan or upload failures, check the log file `/var/log/countit.log` to identify the issue.
