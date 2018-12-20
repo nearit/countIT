@@ -200,7 +200,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
             os.makedirs(outfolder)
         with open(outfolder+'/'+time.strftime('%Y-%m-%dT%H:%M:%S-%z'), 'w') as dump_file:
             data_dump = {
-                'device_id': device_id, 'from': from_time, 'to': to_time, 'devices': detections
+                'device_id': device_id, 'from': from_time, 'to': to_time, 'detections': detections
             }
             dump_file.write(json.dumps(data_dump) + "\n")
 
