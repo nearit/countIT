@@ -29,6 +29,8 @@ with open(config, 'r') as f:
             file_path = os.path.join(path, filename)
             with open(file_path) as f:
                 content = f.read()
-                post_detections(content, endpoint, token)
-    
+                success = post_detections(content, endpoint, token)
+                if success:
+                    os.remove(file_path)
+
     logging.info("Dumps upload done.")
