@@ -112,7 +112,7 @@ def schedule_upload_jobs(directory, upload_frequency):
 def scan(adapter, scantime, max_power, outfolder, device_id):
     """Launch tshark scan"""
     logging.info("Starting a new scan")
-    from_time = time.strftime('%Y-%m-%dT%H:%M:%SZ%z')
+    from_time = time.strftime('%Y-%m-%dT%H:%M:%S-%z')
     try:
         tshark = which("tshark")
     except OSError as err:
@@ -165,7 +165,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
     output, _ = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
-    to_time = time.strftime('%Y-%m-%dT%H:%M:%SZ%z')
+    to_time = time.strftime('%Y-%m-%dT%H:%M:%S-%z')
 
     found_macs = parse_macs(output)
 
@@ -198,7 +198,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
     if outfolder:
         if not os.path.exists(outfolder):
             os.makedirs(outfolder)
-        with open(outfolder+'/'+time.strftime('%Y-%m-%dT%H:%M:%SZ%z'), 'w') as dump_file:
+        with open(outfolder+'/'+time.strftime('%Y-%m-%dT%H:%M:%S-%z'), 'w') as dump_file:
             data_dump = {
                 'device_id': device_id, 'from': from_time, 'to': to_time, 'devices': detections
             }
