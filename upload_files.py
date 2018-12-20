@@ -26,7 +26,8 @@ with open(config, 'r') as f:
     # enumerate local files recursively
     for root, dirs, files in os.walk(path):
         for filename in files:
-            with open(filename) as f:
+            file_path = os.path.join(path, filename)
+            with open(file_path) as f:
                 content = f.read()
                 post_detections(content, endpoint, token)
     
