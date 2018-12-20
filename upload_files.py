@@ -4,7 +4,7 @@ import logging
 import json
 import os
 
-from uploader import upload_file
+from uploader import post_detections
 
 LOG_LEVEL = logging.INFO
 LOG_FILE = "/var/log/countit.log"
@@ -18,17 +18,16 @@ config = os.path.join(script_dir, config_file)
 with open(config, 'r') as f:
     config = json.load(f)
     folder_name = config["customer"]+"/"+config["env"]+"/"+config["device_id"]
-    bucket_name = config["bucket_name"]
+    endpoint = config["endpoint"]
+    token = config["token"]
     path = os.path.join(script_dir, folder_name)
 
     logging.info("Starting dumps upload")
     # enumerate local files recursively
     for root, dirs, files in os.walk(path):
         for filename in files:
-            # construct the full local path
-            file_path = os.path.join(path, filename)
-            # upload the file
-            print folder_name+"/"+filename
-            upload_file(file_path, bucket_name, folder_name+"/"+filename)
+            with open(filename) as f:
+                content = f.read()
+                post_detections(content, endpoint, token)
     
     logging.info("Dumps upload done.")
