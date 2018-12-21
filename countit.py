@@ -9,7 +9,11 @@ import threading
 import time
 import traceback
 
+from datetime import datetime
 from crontab import CronTab
+
+import pytz
+
 
 LOG_LEVEL = logging.INFO
 LOG_FILE = "/var/log/countit.log"
@@ -112,7 +116,7 @@ def schedule_upload_jobs(directory, upload_frequency):
 def scan(adapter, scantime, max_power, outfolder, device_id):
     """Launch tshark scan"""
     logging.info("Starting a new scan")
-    from_time = time.strftime('%Y-%m-%dT%H:%M:%S%z')
+    from_time = timenow()
     try:
         tshark = which("tshark")
     except OSError as err:
@@ -165,7 +169,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
     output, _ = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
-    to_time = time.strftime('%Y-%m-%dT%H:%M:%S%z')
+    to_time = timenow()
 
     found_macs = parse_macs(output)
 
@@ -198,7 +202,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
     if outfolder:
         if not os.path.exists(outfolder):
             os.makedirs(outfolder)
-        with open(outfolder+'/'+time.strftime('%Y-%m-%dT%H:%M:%S%z'), 'w') as dump_file:
+        with open(outfolder+'/'+timenow(), 'w') as dump_file:
             data_dump = {
                 'device_id': device_id, 'from': from_time, 'to': to_time, 'detections': detections
             }
@@ -261,6 +265,10 @@ def which(program):
             if is_exe(exe_file):
                 return exe_file
     raise OSError('No program %s found'%program)
+
+def timenow():
+    """Returns current time in 2006-01-02T15:04:05Z07:00 format"""
+    return datetime.utcnow().replace(microsecond=0).replace(tzinfo=pytz.UTC).isoformat()
 
 if __name__ == "__main__":
     try:
