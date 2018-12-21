@@ -138,28 +138,29 @@ def scan(adapter, scantime, max_power, outfolder, device_id):
     thread.daemon = True
     thread.start()
 
+    outfile = '/tmp/tshark-out-%s'%from_time
     # Scan with tshark
     command = [tshark, '-I', '-i', adapter, '-a',
-               'duration:' + str(scantime), '-w', '/tmp/tshark-temp']
+               'duration:' + str(scantime), '-w', outfile]
 
     _, _ = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
     analysis_thread = threading.Thread(
-        target=parse_scan_result, args=[device_id, max_power, from_time, outfolder]
+        target=parse_scan_result, args=[device_id, max_power, from_time, outfolder, outfile]
     )
     analysis_thread.start()
     #parse_scan_result(tshark, device_id, max_power, from_time, outfolder)
     return adapter
 
-def parse_scan_result(device_id, max_power, from_time, outfolder):
+def parse_scan_result(device_id, max_power, from_time, outfolder, outfile):
     """Parse tshark output"""
     logging.info("Starting output parsing")
 
     # Read tshark output
     command = [
         which("tshark"), '-r',
-        '/tmp/tshark-temp', '-T',
+        outfile, '-T',
         'fields', '-e',
         'wlan.sa', '-e',
         'wlan.bssid', '-e',
@@ -209,7 +210,7 @@ def parse_scan_result(device_id, max_power, from_time, outfolder):
             dump_file.write(json.dumps(data_dump) + "\n")
 
     # Remove tmp tshark output
-    os.remove('/tmp/tshark-temp')
+    os.remove(outfile)
 
 def parse_macs(output):
     """Parse tshark output and return a dict"""
